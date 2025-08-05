@@ -25,7 +25,7 @@ connectMongo();
 function startServer(options = {}) {
   const app = express();
   const {
-    port = 3001,
+    port = 10000,
     uploadPath = path.join(__dirname),
     allowedOrigin = "http://localhost:5173",
   } = options;
