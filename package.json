@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "backend",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon src/localServer.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "archive": "^0.0.2",
+    "archiver": "^7.0.1",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.1.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mariadb": "^3.4.1",
+    "mime": "^2.6.0",
+    "mongoose": "^8.17.0",
+    "multer": "^1.4.5-lts.2",
+    "sequelize": "^6.37.7",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
