@@ -68,6 +68,11 @@ function startServer(options = {}) {
   app.use("/social", socialMediaRoutes);
   app.use("/social", express.static(path.join(__dirname, "uploads", "social")));
 
+  // Exemple route
+app.get('/', (req, res) => {
+  res.send('🚀 API + MongoDB Atlas en ligne avec Render !');
+});
+
   // Code à étudier
   // const upload = multer({
   //   storage: multer.diskStorage({
