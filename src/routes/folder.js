@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
     })
         .then(folder => {
             fs.mkdirSync(newFolder, { recursive: true })  
-            const message = 'Votre compte a été bien enregistré.'
+            const message = 'Votre dossier a été bien enregistré.'
             res.status(200).json({ message, data: folder })
         })
         .catch(err => { 
@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
 router.get('/', (req, res) => {
     Folder.findAll()
         .then(folder => {
-            const message = 'Fichier recupérée avec success';
+            const message = 'Dossier recupérée avec success';
             res.status(200).json({ message, data: folder })
         })
 })
@@ -42,7 +42,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     Folder.findByPk(req.params.id)
         .then(folder => {
-            const message = 'Fichier recupérée avec success';
+            const message = 'Dossier recupérée avec success';
             res.status(200).json({ message, data: folder })
         })
 })
@@ -51,11 +51,11 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params 
     
     try {
-        // Verifier si le fichier existe dans la base de donnée
+        // Verifier si le Dossier existe dans la base de donnée
         const folder = await Folder.findByPk(id)
 
         if (!folder) {
-            return res.status(404).json({ message: 'Fichier introuvable.' });
+            return res.status(404).json({ message: 'Dossier introuvable.' });
         }
         const finaDir = path.join(getFinalUploadPath(), folder.libelle_folder) ;
         fs.rm(finaDir, { 
@@ -70,7 +70,7 @@ router.delete('/:id', async (req, res) => {
                 // Get the current filenames
                 // in the directory to verify
             await Folder.destroy({ where: { id_folder: id } });
-        return res.status(200).json({ message: 'Fichier supprimé avec succès.' });
+        return res.status(200).json({ message: 'Dossier supprimé avec succès.' });
 
                 
             }
