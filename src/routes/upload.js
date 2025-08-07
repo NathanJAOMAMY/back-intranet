@@ -34,44 +34,24 @@ function getFinalUploadPath() {
 }
 
 // Upload simple (un seul fichier)
-router.post('/upload', (req, res) => {
-  upload.single('file')(req, res, (err) => {
-    if (err) {
-      console.error('Erreur multer :', err);
-      return res.status(500).json({ message: 'Erreur lors de l\'upload.' });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ message: 'Aucun fichier reçu.' });
-    }
-
-    const fichierTemporaire = req.file.path;
-    console.log(fichierTemporaire);  
+router.post('/upload', async (req, res) => {
     
-    const nomFichier = req.file.originalname;
-    const size = req.file.size;
-    const type = path.extname(nomFichier).substring(1);
-    const destinationFinale = path.join(finalUploadDir, nomFichier);
-
-    fs.rename(fichierTemporaire, destinationFinale, async (err) => {
-      if (err) {
-        console.error('Erreur lors du déplacement du fichier :', err);
-        return res.status(500).json({ message: 'Erreur lors du déplacement du fichier.' });
-      }
+    // const destinationFinale = path.join(finalUploadDir, nomFichier);
+    const { libelle_file, size_file, url } = req.body;
+    const type_file = path.extname(libelle_file).substring(1);
 
       try {
         await Files.create({
-          libelle_file: nomFichier,
-          size_file: size,
-          type_file: type,
+          libelle_file: libelle_file,
+          size_file: size_file,
+          type_file: type_file,
+          url: url,
         });
         res.json({ message: 'Fichier déplacé avec succès.' });
       } catch (dbErr) {
         console.error('Erreur DB :', dbErr);
         res.status(500).json({ message: 'Erreur lors de l\'enregistrement.' });
       }
-    });
-  });
 });
 
 // Upload multiple fichiers (ex: dossier)
