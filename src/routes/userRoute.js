@@ -115,6 +115,8 @@ router.post("/login", (req, res) => {
 
 // 2 - Find one users : gestion d'erreur finish
 router.get("/:id", (req, res) => {
+  console.log("On est ici");
+  
   User.findByPk(req.params.id)
     .then((user) => {
       if (!user) {

@@ -19,13 +19,13 @@ const uploadRoutesChat = require("./routes/uploadRouteChat");
 const connectMongo = require("./db/db.js");
 const env = require("dotenv");
 env.config();
-
+ 
 connectMongo();
 
 function startServer(options = {}) {
   const app = express();
   const {
-    port = 10000,
+    port = 3001,
     uploadPath = path.join(__dirname),
     allowedOrigin = "http://localhost:5173",
   } = options;
@@ -67,11 +67,6 @@ function startServer(options = {}) {
   app.use("/api", uploadRoutesChat);
   app.use("/social", socialMediaRoutes);
   app.use("/social", express.static(path.join(__dirname, "uploads", "social")));
-
-  // Exemple route
-app.get('/', (req, res) => {
-  res.send('🚀 API + MongoDB Atlas en ligne avec Render !');
-});
 
   // Code à étudier
   // const upload = multer({
