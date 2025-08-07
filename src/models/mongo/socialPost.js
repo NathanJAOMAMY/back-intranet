@@ -16,7 +16,7 @@ const socialPostSchema = new mongoose.Schema({
   idUser: { type: String, required: true },
   isArticle: { type: Boolean, default: false },
   articleTitle: String,
-  files: [fileSchema],
+  files: [{ url: String }],
   links: [{ url: String }],
   reactions: [
     {

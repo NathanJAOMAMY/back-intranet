@@ -50,7 +50,7 @@ const initDb = () => {
             roleUser: "admin",
             password: hash,
           }).then(newUser => {
-            syncUserToMongo(newUser.idUser);
+            // syncUserToMongo(newUser.idUser);
           });
         });
         bcrypt.hash("0000", 10).then((hash) => {
@@ -61,7 +61,7 @@ const initDb = () => {
             roleUser: "user",
             password: hash,
           }).then(newUser => {
-            syncUserToMongo(newUser.idUser);
+            // syncUserToMongo(newUser.idUser);
           });
         });
         bcrypt.hash("0000", 10).then((hash) => {
@@ -72,7 +72,7 @@ const initDb = () => {
             roleUser: "user",
             password: hash,
           }).then(newUser => {
-            syncUserToMongo(newUser.idUser);
+            // syncUserToMongo(newUser.idUser);
           });
         });
         bcrypt.hash("0000", 10).then((hash) => {
@@ -83,7 +83,7 @@ const initDb = () => {
             roleUser: "user",
             password: hash,
           }).then(newUser => {
-            syncUserToMongo(newUser.idUser);
+            // syncUserToMongo(newUser.idUser);
           });
         });
       }
