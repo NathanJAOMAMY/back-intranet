@@ -10,7 +10,7 @@ const {Files, sequelize} = require('../db/sequelize')
 const path = require('path')
 
 router.get('/', (req,res)=>{
-    const params = req.query.id
+    const params = req.query.id ? req.query.id : null;
     
     Files.findAll({
         where : { 
@@ -22,18 +22,6 @@ router.get('/', (req,res)=>{
         res.status(200).json({message, data : files})
     })
 })
-
-router.get('/free', (req,res)=>{
-    Files.findAll({
-        where : {
-            folder_id : null, 
-        }
-    })
-    .then(files=>{
-        const message = 'Fichier recupérée avec success';
-        res.status(200).json({message, data : files})
-    })
-}) 
 
 router.get('/:id', (req,res)=>{
     Files.findByPk(req.params.id)
