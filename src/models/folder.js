@@ -1,21 +1,24 @@
-/* eslint-disable no-undef */
-module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('folder', {
-        id_folder: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true // Assuming you want auto-incrementing IDs
-        },
-        libelle_folder: {
-            type: DataTypes.STRING(50),
-            allowNull: true // Assuming this field can be null
-        },
-        status_folder: {
-            type: DataTypes.INTEGER,
-            defaultValue : 1,
-            allowNull: true // Assuming this field can be null
-        }
-    }, {
-        timestamps: true // Assuming you don't want createdAt and updatedAt fields
-    });
-}
+
+const mongoose = require('mongoose');
+
+const folderSchema = new mongoose.Schema({
+    id_folder: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    libelle_folder: {
+        type: String,
+        maxlength: 50,
+        default: null
+    },
+    status_folder: {
+        type: Number,
+        default: 1
+    }
+    // Assuming you want to keep the timestamps
+}, {
+    timestamps: true // createdAt and updatedAt fields
+});
+
+module.exports = mongoose.model('Folder', folderSchema);
