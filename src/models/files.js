@@ -1,40 +1,46 @@
-/* eslint-disable no-undef */
-module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('files', {
-        id_file: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true // Assuming you want auto-incrementing IDs
-        },
-        libelle_file: {
-            type: DataTypes.STRING(50),
-            allowNull: true // Assuming this field can be null
-        },
-        size_file: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        type_file: {
-            type: DataTypes.STRING(50),
-            allowNull: false 
-        },
-        readed: {
-            type: DataTypes.INTEGER,
-            defaultValue : 0,
-            allowNull: false  
-        },
-        status_file: {
-            type: DataTypes.INTEGER,
-            defaultValue : 1,
-            allowNull: true // Assuming this field can be null
-        },
-        folder_id: {
-            type: DataTypes.INTEGER,
-            defaultValue : null,
-            allowNull: true // Assuming this field can be null
-        },
-        
-    }, {
-        timestamps: true // Assuming you don't want createdAt and updatedAt fields
-    });
-}
+const mongoose = require('mongoose');
+
+const fileSchema = new mongoose.Schema({
+    id_file: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    libelle_file: {
+        type: String,
+        maxlength: 50,
+        default: null
+    },
+    size_file: {
+        type: String,
+        maxlength: 50,
+        required: true
+    },
+    type_file: {
+        type: String,
+        maxlength: 50,
+        required: true
+    },
+    url: {
+        type: String,
+        maxlength: 255,
+        required: true
+    },
+    readed: {
+        type: Number,
+        default: 0,
+        required: true
+    },
+    status_file: {
+        type: Number,
+        default: 1
+    },
+    folder_id: {
+        type: Number,
+        default: null
+    }
+}, {
+    timestamps: true // createdAt and updatedAt fields
+});
+
+module.exports = mongoose.model('File', fileSchema);
