@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const fileSchema = new mongoose.Schema({
+const fileSchema = new mongoose.Schema({ 
     id_file: {
         type: String,
         required: true,
@@ -36,11 +36,11 @@ const fileSchema = new mongoose.Schema({
         default: 1
     },
     folder_id: {
-        type: Number,
+        type: String,
         default: null
     }
 }, {
     timestamps: true // createdAt and updatedAt fields
-});
-
+}); 
+ 
 module.exports = mongoose.model('File', fileSchema);

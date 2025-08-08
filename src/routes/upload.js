@@ -29,7 +29,7 @@ function setUploadPath(baseDir) {
 }
 
 // Récupérer le dossier d'upload
-function getFinalUploadPath() {
+function getFinalUploadPath() { 
   return finalUploadDir;
 }
 

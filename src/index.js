@@ -47,7 +47,7 @@ function startServer(options = {}) {
   );
 
   socketInit(io);
-  sequelize.initDb();
+  // sequelize.initDb();
   uploadRoutes.setUploadPath(uploadPath);
 
   app.use("/images", express.static(path.join(uploadPath, "uploads", "final")));

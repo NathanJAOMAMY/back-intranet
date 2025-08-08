@@ -5,7 +5,7 @@ const { syncUserToMongo } = require('../utils/userSync');
 const fileModel = require("../models/files");
 const userModel = require("../models/users");
 const folderModel = require("../models/folder");
-const codeModel = require("../models/codeInscription");
+const codeModel = require("../models/codeInscriptionModel");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid").v4; 
 
@@ -14,7 +14,7 @@ let dbPath;
 // Vérifie si le code tourne dans Electron
 const isElectron = () => {
   return !!(process.versions && process.versions.electron);
-};
+}; 
 
 // Si dans Electron, on va chercher le bon chemin pour stocker la BDD
 if (isElectron()) {
