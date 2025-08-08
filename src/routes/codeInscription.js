@@ -3,41 +3,15 @@
 const express = require('express')
 const router = express.Router()
 
-const {CodeInscription} = require('../db/sequelize')
+const {createCodeInscription, getAllCodes, getSingleCode}  = require ('../controllers/codeController.js')
 
-router.post('/', (req, res)=>{
-    const code = req.body
-    console.log(code);
-      
+// const {CodeInscription} = require('../db/sequelize')
 
-        CodeInscription.create({
-            content_code : code.content_code,
-        }) 
-    .then(code=>{
-        const message = 'Votre compte a été bien enregistré.'
-        res.status(200).json({message, data:code})
-    })
-    .catch(err=>{
-        res.status(500).json({err})
-    }) 
-   
-}) 
+router.post('/', createCodeInscription) 
 
-router.get('/', (req,res)=>{
-    CodeInscription.findAll()
-    .then(code=>{
-        const message = 'code recupérée avec success';
-        res.status(200).json({message, data : code})
-    })
-})
+router.get('/', getAllCodes)
 
-router.get('/:id', (req,res)=>{
-    CodeInscription.findByPk(req.params.id)
-    .then(code=>{
-        const message = 'code recupérée avec success';
-        res.status(200).json({message, data : code})
-    })
-})
+router.get('/:id', getSingleCode)
 
 router.delete('/', async (req,res)=>{
     const {id} = req.query
