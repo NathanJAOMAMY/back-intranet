@@ -8,7 +8,7 @@ const fileSchema = new mongoose.Schema({
     },
     libelle_file: {
         type: String,
-        maxlength: 50,
+        maxlength: 255,
         default: null
     },
     size_file: {

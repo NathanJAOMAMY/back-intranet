@@ -6,10 +6,11 @@ const router = express.Router()
 const fs = require('fs')
 const {getFinalUploadPath} = require('./upload')
 
-const {getFiles, createFile, deleteFile, getFileById} = require('../controllers/fileController')
+const {getFiles, createFile, deleteFile, getFileById, createMultipleFiles} = require('../controllers/fileController')
 const path = require('path')
 
 router.post('/', createFile)
+router.post('/many', createMultipleFiles)
 
 router.get('/', getFiles)
 

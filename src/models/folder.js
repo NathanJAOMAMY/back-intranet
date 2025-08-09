@@ -8,7 +8,7 @@ const folderSchema = new mongoose.Schema({
         unique: true
     },
     libelle_folder: {
-        type: String,
+        type: String, 
         maxlength: 50,
         default: null
     },

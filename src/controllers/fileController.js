@@ -1,4 +1,6 @@
+const { request } = require('express');
 const fileModel = require('../models/files');
+const folderModel = require('../models/folder');
 
 const createFile = async (req, res) => {
     const { id_file, libelle_file, size_file, type_file, url } = req.body;
@@ -74,9 +76,43 @@ const deleteFile = async (req, res) => {
     }
 }
 
+// to check
+const createMultipleFiles = async (req, res) => {
+    const id_folder = req.body.folder_id;
+    const folderName = req.body.folder_name;
+    const files = req.body.files;
+    
+
+    try {
+        // Création du dossier
+        const folder = await folderModel.create({
+            id_folder: id_folder,
+            libelle_folder: folderName 
+        });
+
+        // Ajout des fichiers
+        const filesToCreate = files.map(file => ({
+            id_file: file.id_file,
+            libelle_file: file.libelle_file,
+            size_file: file.size_file,
+            type_file: file.type_file,
+            url: file.url,
+            folder_id: folder.id_folder // MongoDB utilise _id
+        }));
+
+        await fileModel.insertMany(filesToCreate);
+
+        res.status(200).send('Fichiers enregistrés avec succès.');
+    } catch (error) {
+        console.error('Erreur lors de l\'importation :', error);
+        res.status(500).send('Erreur serveur.');
+    }
+}
+
 module.exports = {
     createFile,
     getFiles,
     deleteFile,
-    getFileById
+    getFileById,
+    createMultipleFiles
 };

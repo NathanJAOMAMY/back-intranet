@@ -55,16 +55,68 @@ router.post('/upload', async (req, res) => {
 });
 
 // Upload multiple fichiers (ex: dossier)
-router.post('/upload-folder', (req, res) => {
+// router.post('/upload-folder', (req, res) => {
 
 
-  upload.fields([{ name: 'files' }, { name: 'foldername' }])(req, res, async (err) => {
-    if (err) {
-      console.error('Erreur multer :', err);
-      return res.status(500).send('Erreur serveur.');
-    }
+//   upload.fields([{ name: 'files' }, { name: 'foldername' }])(req, res, async (err) => {
+//     if (err) {
+//       console.error('Erreur multer :', err);
+//       return res.status(500).send('Erreur serveur.');
+//     }
+//     const folderName = req.body.foldername;
+
+
+//     const transaction = await sequelize.transaction();
+
+//     try {
+//       const folder = await Folder.create({
+//         libelle_folder: folderName
+//       }, { transaction })
+
+//       const newFolder = path.join(finalUploadDir,folderName)
+
+//       fs.mkdirSync(newFolder, { recursive: true })
+
+//       try {
+//         for (const file of req.files.files) {
+//           const nomFichier = file.originalname; 
+//           const size = file.size;
+//           const type = path.extname(nomFichier).substring(1);
+//           const destinationFinale = path.join(newFolder, nomFichier);
+
+//           fs.renameSync(file.path, destinationFinale); 
+ 
+
+//           await Files.create({
+//             libelle_file: nomFichier,
+//             size_file: size,
+//             type_file: type,
+//             folder_id: folder.id_folder
+//           }, { transaction });
+//         }
+
+//         // Commit the transaction
+//         await transaction.commit();
+
+//         res.status(200).send('Fichiers enregistrés avec succès.');
+//       } catch (error) {
+//         await transaction.rollback(); // Ajoute ça ici
+//         console.error('Erreur lors de l\'importation :', error);
+//         res.status(500).send('Erreur serveur.');
+//       }
+//     } catch (error) {
+//       console.error('Erreur lors de la création du dossier', error);
+//       res.status(500).send('Erreur serveur.');
+//     }
+ 
+
+//   });
+// });
+
+router.post('/upload-folder', async (req, res) => {
+
+
     const folderName = req.body.foldername;
-
 
     const transaction = await sequelize.transaction();
 
@@ -73,18 +125,12 @@ router.post('/upload-folder', (req, res) => {
         libelle_folder: folderName
       }, { transaction })
 
-      const newFolder = path.join(finalUploadDir,folderName)
-
-      fs.mkdirSync(newFolder, { recursive: true })
-
       try {
         for (const file of req.files.files) {
           const nomFichier = file.originalname; 
           const size = file.size;
           const type = path.extname(nomFichier).substring(1);
           const destinationFinale = path.join(newFolder, nomFichier);
-
-          fs.renameSync(file.path, destinationFinale); 
  
 
           await Files.create({
@@ -109,9 +155,8 @@ router.post('/upload-folder', (req, res) => {
       res.status(500).send('Erreur serveur.');
     }
  
-
-  });
 });
+
 
 // router.post('/upload-folder',uploadMulti, async (req, res) => {
 
