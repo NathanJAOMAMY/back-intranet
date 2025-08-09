@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const initDb = require('./initDb.js');
 
 const connectDB = async () => {
   try {
@@ -6,6 +7,7 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    initDb()
     console.log('MongoDB connecté avec succès');
   } catch (err) {
     console.error(' Échec de connexion à MongoDB :', err);
