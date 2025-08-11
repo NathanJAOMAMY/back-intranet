@@ -116,11 +116,11 @@ const userByIds = async (req, res) => {
 // Mise à jour utilisateur sans modifier le mot de passe
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { userName, surname, email, roleUser, statusUser, pseudo } = req.body;
+  const { userName, surname, email, roleUser, statusUser, pseudo , avatar, responsibilities} = req.body;
   try {
     const updatedUser = await User.updateOne(
       { idUser: id },
-      { $set: { userName, surname, email, roleUser, statusUser, pseudo } }
+      { $set: { userName, surname, email, roleUser, statusUser, pseudo , avatar, responsibilities} }
     );
 
     if (!updatedUser) {

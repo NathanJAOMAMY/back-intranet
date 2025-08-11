@@ -70,7 +70,7 @@ function startServer(options = {}) {
   app.use("/social", express.static(path.join(__dirname, "uploads", "social")));
 
   server.listen(port, () => {
-    console.log(`Serveur lancé sur http://localhost:${port}`);
+    console.log(`Serveur lancer`);
   });
 }
 
