@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -9,14 +10,14 @@ const uploadRoutes = require("./routes/upload.js");
 const downloadRoutes = require("./routes/download.js");
 const userRouter = require("./routes/userRoute.js");
 const file = require("./routes/file.js");
-const code = require("./routes/codeInscription.js"); 
+const code = require("./routes/codeInscription.js");
 const folder = require("./routes/folder.js");
 const chat = require("./routes/chat.js");
 const uploadRoutesChat = require("./routes/uploadRouteChat.js");
 const connectMongo = require("./db/db.js");
 const env = require("dotenv");
 env.config();
- 
+
 connectMongo();
 
 function startServer(options = {}) {
@@ -60,13 +61,16 @@ function startServer(options = {}) {
   app.use("/file", file);
   app.use("/code", code);
   app.use("/chat", chat);
-  app.use("/uploads/fileChat", express.static(path.join(__dirname, "uploads/fileChat")));
+  app.use(
+    "/uploads/fileChat",
+    express.static(path.join(__dirname, "uploads/fileChat"))
+  );
   app.use("/api", uploadRoutesChat);
   app.use("/social", socialMediaRoutes);
   app.use("/social", express.static(path.join(__dirname, "uploads", "social")));
-  
+
   server.listen(port, () => {
-    console.log(`Serveur is run`);
+    console.log(`Serveur lancé sur http://localhost:${port}`);
   });
 }
 

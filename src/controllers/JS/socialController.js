@@ -41,11 +41,9 @@ const SocialPost = require('../../models/mongo/socialPost');
 exports.createPost = async (req, res) => {
   console.log('POST /social/posts');
   console.log('req.body:', req.body);
-
-
+  
   try {
     const { content, isArticle, articleTitle,urlFile, links = [] , idUser} = req.body;
-    console.log(idUser)
 
     // Convertir les liens en tableau si c'est une string
     const linksArray = typeof links === 'string' ? [links] : links;
