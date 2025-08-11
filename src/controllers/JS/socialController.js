@@ -40,18 +40,19 @@ const SocialPost = require('../../models/mongo/socialPost');
 
 exports.createPost = async (req, res) => {
   console.log('POST /social/posts');
-  console.log('req.body:', req.body)
+  console.log('req.body:', req.body);
+
 
   try {
-    const { content, isArticle, articleTitle,urlFile, links = [] } = req.body;
-    const { userId } = req.user; // <-- Prend userId du token
+    const { content, isArticle, articleTitle,urlFile, links = [] , idUser} = req.body;
+    console.log(idUser)
 
     // Convertir les liens en tableau si c'est une string
     const linksArray = typeof links === 'string' ? [links] : links;
 
     const post = new SocialPost({
       content,
-      idUser: String(userId), // <-- Utilise userId ici
+      idUser: String(idUser), // <-- Utilise userId ici
       isArticle: !!isArticle,
       ...(isArticle && { articleTitle }),
       files: urlFile.filter(Boolean).map(url => ({ url })),
