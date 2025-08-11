@@ -144,8 +144,7 @@ exports.addReaction = async (req, res) => {
 // POST /social/posts/:postId/comment
 exports.addComment = async (req, res) => {
   const { postId } = req.params;
-  const { content } = req.body;
-  const userId = req.user.userId;
+  const { content , userId } = req.body; 
   console.log(userId)
   const userName = req.user.userName; 
   const avatar = req.user.avatar;
