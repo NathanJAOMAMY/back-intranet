@@ -1,7 +1,7 @@
 // server/socket.js
 module.exports = (io) => {
   io.on("connection", (socket) => {
-    console.log("Socket connectée:", socket.id);
+    // console.log("Socket connectée:", socket.id);
 
     // Un client s'identifie (rejoindre sa room perso)
     socket.on("userConnected", (userId) => {

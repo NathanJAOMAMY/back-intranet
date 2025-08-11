@@ -1,7 +1,4 @@
-/* eslint-disable no-undef */
 const express = require("express");
-const sequelize = require("./db/sequelize.js");
-const { Files } = require("./db/sequelize.js");
 const cors = require("cors");
 const path = require("path");
 const { Server } = require("socket.io");
@@ -47,7 +44,6 @@ function startServer(options = {}) {
   );
 
   socketInit(io);
-  // sequelize.initDb();
   uploadRoutes.setUploadPath(uploadPath);
 
   app.use("/images", express.static(path.join(uploadPath, "uploads", "final")));
@@ -68,47 +64,9 @@ function startServer(options = {}) {
   app.use("/api", uploadRoutesChat);
   app.use("/social", socialMediaRoutes);
   app.use("/social", express.static(path.join(__dirname, "uploads", "social")));
-
-  // Code à étudier
-  // const upload = multer({
-  //   storage: multer.diskStorage({
-  //     destination: (req, file, cb) => {
-  //       const uploadPath = path.join(__dirname, "uploads/final", path.dirname(file.originalname));
-  //       fs.mkdirSync(uploadPath, { recursive: true }); // crée les sous-dossiers
-  //       cb(null, uploadPath);
-  //     },
-  //     filename: (req, file, cb) => {
-  //       cb(null, path.basename(file.originalname));
-  //     },
-  //   }),
-  // });
-
-  // app.post("/upload-folder", upload.array("files"), async  (req, res) => {
-  //    try {
-  //     const fichiers = req.files;
-
-  //     // Enregistrer chaque fichier dans la BDD
-  //     for (const file of fichiers) {
-  //           const nomFichier = file.originalname;
-  //           const size = file.size;
-  //           const type = path.extname(nomFichier).substring(1);
-
-  //       await Files.create({
-  //         libelle_file: nomFichier,
-  //         size_file: size,
-  //         type_file: type,
-  //       });
-  //     }
-
-  //     res.status(200).send("Dossier reçu et fichiers enregistrés.");
-  //   } catch (error) {
-  //     console.error("Erreur lors de l'importation :", error);
-  //     res.status(500).send("Erreur serveur lors de l'importation.");
-  //   }
-  // });
-
+  
   server.listen(port, () => {
-    console.log(`✅ Serveur lancé sur http://localhost:${port}`);
+    console.log(`Serveur is run`);
   });
 }
 
