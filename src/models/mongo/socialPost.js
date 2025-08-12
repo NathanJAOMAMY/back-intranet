@@ -21,38 +21,28 @@ const socialPostSchema = new mongoose.Schema({
   reactions: [
     {
       userId: String,
-      userName: String, // <-- ajoute ceci
-      avatar: String, // <-- ajoute ceci
       types: String
     }
   ],
   comments: [
     {
       userId: String,
-      userName: String,
-      avatar: String,
       content: String,
       createdAt: { type: Date, default: Date.now },
       reactions: [
         {
           userId: String,
-          userName: String, // <-- ajoute ceci
-          avatar: String, // <-- ajoute ceci
           types: String
         }
       ],
       replies: [
         {
           userId: String,
-          userName: String,
-          avatar: String,
           content: String,
           createdAt: { type: Date, default: Date.now },
           reactions: [
       {
         userId: String,
-        userName: String, // <-- ajoute ceci
-        avatar: String, // <-- ajoute ceci
         types: String
       }
     ]

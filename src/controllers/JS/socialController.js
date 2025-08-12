@@ -50,13 +50,13 @@ exports.createPost = async (req, res) => {
 
     const post = new SocialPost({
       content,
-      idUser: String(idUser), // <-- Utilise userId ici
+      idUser: String(idUser),
       isArticle: !!isArticle,
       ...(isArticle && { articleTitle }),
       files: urlFile.filter(Boolean).map(url => ({ url })),
       links: linksArray.filter(Boolean).map(url => ({ url })),
-      reactions: [], // <-- AJOUTE CETTE LIGNE
-      comments: []   // <-- AJOUTE CETTE LIGNE
+      reactions: [], 
+      comments: []  
     });
 
     await post.save();
@@ -117,10 +117,7 @@ exports.getPosts = async (req, res) => {
 exports.addReaction = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { type } = req.body;
-    const userId = req.user.userId;
-    const userName = req.user.userName;
-    const avatar = req.user.avatar;
+    const { type, userId } = req.body;
     const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
 
@@ -128,10 +125,8 @@ exports.addReaction = async (req, res) => {
     const existingReaction = post.reactions.find(r => r.userId === userId);
     if (existingReaction) {
       existingReaction.types = type;
-      existingReaction.userName = userName;
-      existingReaction.avatar = avatar;
     } else {
-      post.reactions.push({ userId, userName, avatar, types: type });
+      post.reactions.push({ userId, types: type });
     }
 
     await post.save();
@@ -146,10 +141,8 @@ exports.addComment = async (req, res) => {
   const { postId } = req.params;
   const { content , userId } = req.body; 
   console.log(userId)
-  const userName = req.user.userName; 
-  const avatar = req.user.avatar;
   const post = await SocialPost.findById(postId);
-  post.comments.push({ userId, userName, content });
+  post.comments.push({ userId, content });
   await post.save();
   res.json(post.comments);
 };
@@ -158,10 +151,7 @@ exports.addComment = async (req, res) => {
 exports.addCommentReaction = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
-    const { type } = req.body;
-    const userId = req.user.userId;
-    const userName = req.user.userName;
-    const avatar = req.user.avatar;
+    const { type, userId } = req.body;
     const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
 
@@ -172,10 +162,8 @@ exports.addCommentReaction = async (req, res) => {
     const existingReaction = comment.reactions.find(r => r.userId === userId);
     if (existingReaction) {
       existingReaction.types = type;
-      existingReaction.userName = userName;
-      existingReaction.avatar = avatar;
     } else {
-      comment.reactions.push({ userId, userName, avatar, types: type });
+      comment.reactions.push({ userId, types: type });
     }
 
     await post.save();
@@ -188,20 +176,14 @@ exports.addCommentReaction = async (req, res) => {
 exports.replyToComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
-    const { content } = req.body;
-    const userId = req.user.userId;
-    const userName = req.user.userName;
-    const avatar = req.user.avatar;
+    const { content, userId } = req.body;
     const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
-
     const comment = post.comments.id(commentId);
     if (!comment) return res.status(404).json({ error: "Commentaire non trouvé" });
 
     comment.replies.push({
       userId,
-      userName,
-      avatar,
       content,
       createdAt: new Date()
     });
@@ -217,10 +199,7 @@ exports.replyToComment = async (req, res) => {
 exports.addReplyReaction = async (req, res) => {
   try {
     const { postId, commentId, replyId } = req.params;
-    const { type } = req.body;
-    const userId = req.user.userId;
-    const userName = req.user.userName;
-    const avatar = req.user.avatar;
+    const { type, userId } = req.body;
     const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
 
@@ -234,10 +213,8 @@ exports.addReplyReaction = async (req, res) => {
     const existingReaction = reply.reactions.find(r => r.userId === userId);
     if (existingReaction) {
       existingReaction.types = type;
-      existingReaction.userName = userName;
-      existingReaction.avatar = avatar;
     } else {
-      reply.reactions.push({ userId, userName, avatar, types: type });
+      reply.reactions.push({ userId,types: type });
     }
 
     await post.save();
