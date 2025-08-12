@@ -1,4 +1,3 @@
-// server/socket.js
 module.exports = (io) => {
   io.on("connection", (socket) => {
     // console.log("Socket connectée:", socket.id);
@@ -46,7 +45,6 @@ module.exports = (io) => {
         io.to(`user_${uid}`).emit("newConversation", conversation);
       });
     });
-
     socket.on("disconnect", () => {
       // console.log(`Socket déconnectée: ${socket.id}`);
     });

@@ -3,7 +3,7 @@ const ConversationUsers = require("../models/conversationUser");
 const ChatConversation = require("../models/chatConversation");
 //  Envoyer un message
 const sendMessage = async (req, res) => {
-  const { conversationId, content, senderId, id , file} = req.body;
+  const { conversationId, content, senderId, id, file } = req.body;
 
   try {
     const message = await Chat.create({
@@ -134,6 +134,33 @@ const updateConversationUser = async (req, res) => {
   }
 };
 
+const updatedConversation = async (req, res) => {
+  const { conversationId, userIds } = req.body;
+  if (!conversationId || !Array.isArray(userIds) || userIds.length === 0) {
+    return res.status(400).json({ message: "conversationId et userIds sont requis." });
+  }
+
+  try {
+    // Mise à jour sans duplication
+    const updatedConversation = await ChatConversation.findOneAndUpdate(
+      { id: conversationId },
+      { $addToSet: { userIdConversations: { $each: userIds } } },
+      { new: true }
+    );
+
+    if (!updatedConversation) {
+      return res.status(404).json({ message: "Conversation introuvable." });
+    }
+
+    // Réponse OK avec la conversation mise à jour
+    return res.status(200).json(updatedConversation);
+
+  } catch (err) {
+    console.error("Erreur mise à jour conversation:", err);
+    return res.status(500).json({ message: "Erreur serveur." });
+  }
+};
+
 module.exports = {
   sendMessage,
   getMessages,
@@ -142,4 +169,5 @@ module.exports = {
   getConversationUsers,
   setChatConvesation,
   getChatConvesation,
+  updatedConversation
 };
