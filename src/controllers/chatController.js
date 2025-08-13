@@ -135,16 +135,33 @@ const updateConversationUser = async (req, res) => {
 };
 
 const updatedConversation = async (req, res) => {
-  const { conversationId, userIds } = req.body;
-  if (!conversationId || !Array.isArray(userIds) || userIds.length === 0) {
-    return res.status(400).json({ message: "conversationId et userIds sont requis." });
+  const { conversationId, userIds, conversation } = req.body;
+
+  if (!conversationId) {
+    return res.status(400).json({ message: "conversationId est requis." });
   }
 
   try {
-    // Mise à jour sans duplication
+    let updateQuery = {};
+
+    //ajout de nouveaux membres sans duplication
+    if (Array.isArray(userIds) && userIds.length > 0) {
+      updateQuery.$addToSet = { userIdConversations: { $each: userIds } };
+    }
+
+    //mise à jour d'autres champs de la conversation
+    if (conversation && typeof conversation === "object") {
+      updateQuery.$set = conversation;
+    }
+
+    if (Object.keys(updateQuery).length === 0) {
+      return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
+    }
+
+    // Mise à jour
     const updatedConversation = await ChatConversation.findOneAndUpdate(
       { id: conversationId },
-      { $addToSet: { userIdConversations: { $each: userIds } } },
+      updateQuery,
       { new: true }
     );
 
@@ -152,7 +169,6 @@ const updatedConversation = async (req, res) => {
       return res.status(404).json({ message: "Conversation introuvable." });
     }
 
-    // Réponse OK avec la conversation mise à jour
     return res.status(200).json(updatedConversation);
 
   } catch (err) {

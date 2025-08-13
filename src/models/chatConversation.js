@@ -19,6 +19,10 @@ const chatConversationSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
+    icon : {
+      type : String,
+      default : ''
+    }
   },
   {
     timestamps: true, // ajoute createdAt et updatedAt
