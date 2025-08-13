@@ -223,3 +223,57 @@ exports.addReplyReaction = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la réaction à la réponse" });
   }
 };
+
+
+exports.updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { content, isArticle, articleTitle, links = [] } = req.body;
+    // Si tu utilises l’auth, prends userId du token
+    // const { userId } = req.user;
+    // Sinon, prends-le du body (pas recommandé pour la sécurité)
+    const { idUser } = req.body;
+
+    // Gère les fichiers uploadés
+    let files = [];
+    if (req.files && req.files.length > 0) {
+      files = req.files.map(file => ({
+        url: `/social/${file.filename}`,
+        type: file.mimetype.split('/')[0] === 'image' ? 'image' :
+              file.mimetype.split('/')[0] === 'video' ? 'video' : 'file'
+      }));
+    } else if (req.body.urlFile) {
+      // Si urlFile est envoyé (ex: pour garder les anciens fichiers)
+      files = req.body.urlFile.filter(Boolean).map(url => ({ url }));
+    }
+
+    const linksArray = typeof links === 'string' ? [links] : links;
+
+    const updated = await SocialPost.findByIdAndUpdate(
+      postId,
+      {
+        content,
+        isArticle: !!isArticle,
+        articleTitle,
+        files,
+        links: linksArray.filter(Boolean).map(url => ({ url }))
+      },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: "Post non trouvé" });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la modification du post", details: error.message });
+  }
+};
+
+exports.deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const deleted = await SocialPost.findByIdAndDelete(postId);
+    if (!deleted) return res.status(404).json({ error: "Post non trouvé" });
+    res.json({ message: "Post supprimé avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la suppression du post", details: error.message });
+  }
+};

@@ -20,5 +20,17 @@ router.post(
   authMiddleware,
   socialController.addReplyReaction
 );
+router.put(
+  '/posts/:postId',
+  authMiddleware,
+  upload.array('files', 10), // Pour gérer l’édition des fichiers aussi
+  socialController.updatePost
+);
+
+router.delete(
+  '/posts/:postId',
+  authMiddleware,
+  socialController.deletePost
+);
 
 module.exports = router;
