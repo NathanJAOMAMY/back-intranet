@@ -109,6 +109,23 @@ const getConversationUsers = async (req, res) => {
   }
 };
 
+const findConversationUser = async (req, res) => {
+  const { idConversation, idUser } = req.params;
+  console.log(idConversation , idUser);
+  try {
+    const conversationUser = await ConversationUsers.findOne({
+      idConversation: idConversation,
+      idUser: idUser,
+    });
+    res.status(200).json(conversationUser);
+  } catch (error) {
+    console.error("Erreur serveur :", error);
+    res.status(500).json({
+      error:
+        "Erreur lors de la récupération de l'utilisateur de la conversation",
+    });
+  }
+};
 //  Mettre à jour le statut de lecture
 const updateConversationUser = async (req, res) => {
   const { idConversation, idUser, isRead } = req.body;
@@ -155,7 +172,9 @@ const updatedConversation = async (req, res) => {
     }
 
     if (Object.keys(updateQuery).length === 0) {
-      return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
+      return res
+        .status(400)
+        .json({ message: "Aucune donnée à mettre à jour." });
     }
 
     // Mise à jour
@@ -170,7 +189,6 @@ const updatedConversation = async (req, res) => {
     }
 
     return res.status(200).json(updatedConversation);
-
   } catch (err) {
     console.error("Erreur mise à jour conversation:", err);
     return res.status(500).json({ message: "Erreur serveur." });
@@ -185,5 +203,6 @@ module.exports = {
   getConversationUsers,
   setChatConvesation,
   getChatConvesation,
-  updatedConversation
+  updatedConversation,
+  findConversationUser,
 };

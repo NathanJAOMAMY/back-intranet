@@ -21,11 +21,12 @@ module.exports = (io) => {
     socket.on("sendMessage", (message) => {
       const { conversationId, senderId, receiverId } = message;
 
-      // 1. Émettre à tous dans la conversation (pour ceux qui regardent)
+      // 1. Émettre à tous dans la conversation (pour ceux qui regardent en direct)
       io.to(conversationId).emit("newMessage", message);
 
-      // 2. Notification spécifique pour destinataire (badge / pastille)
+      // 2. Émettre aussi directement au destinataire via sa room perso
       if (receiverId) {
+        io.to(`user_${receiverId}`).emit("newMessage", message); // ajout ici
         io.to(`user_${receiverId}`).emit("new_message_notification", {
           conversationId,
           message,
