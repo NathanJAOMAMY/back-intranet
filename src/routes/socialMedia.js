@@ -1,14 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const socialController = require('../controllers/JS/socialController');
-const upload = require('../middlewares/upload');
 const authMiddleware = require('../middlewares/auth');
-
-router.post('/posts', 
-  authMiddleware, 
-  upload.array('files', 10), // Max 10 fichiers
-  socialController.createPost
-);
 
 router.get('/posts', socialController.getPosts);
 router.post('/posts/:postId/reaction', authMiddleware, socialController.addReaction);
@@ -19,12 +12,6 @@ router.post(
   '/posts/:postId/comment/:commentId/reply/:replyId/reaction',
   authMiddleware,
   socialController.addReplyReaction
-);
-router.put(
-  '/posts/:postId',
-  authMiddleware,
-  upload.array('files', 10), // Pour gérer l’édition des fichiers aussi
-  socialController.updatePost
 );
 
 router.delete(

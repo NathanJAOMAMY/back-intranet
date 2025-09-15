@@ -5,12 +5,6 @@ if (mongoose.models.SocialPost) {
   delete mongoose.models.SocialPost;
 }
 
-
-const fileSchema = new mongoose.Schema({
-  url: String,
-  type: { type: String, enum: ['image', 'video', 'file'], default: 'file' }
-});
-
 const socialPostSchema = new mongoose.Schema({
   content: { type: String },
   idUser: { type: String, required: true },
