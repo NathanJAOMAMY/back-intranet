@@ -2,19 +2,19 @@ const express = require("express");
 const cors = require("cors");
 const { Server } = require("socket.io");
 const http = require("http");
-const socketInit = require("./sockets/sockets.js");
-const socialMediaRoutes = require("./routes/socialMedia.js");
-const userRouter = require("./routes/userRoute.js");
-const file = require("./routes/file.js");
-const code = require("./routes/codeInscription.js");
-const folder = require("./routes/folder.js");
-const chat = require("./routes/chat.js");
-const connectMongo = require("./db/db.js");
+const socketInit = require("./src/sockets/sockets.js");
+const socialMediaRoutes = require("./src/routes/socialMedia.js");
+const userRouter = require("./src/routes/userRoute.js");
+const file = require("./src/routes/file.js");
+const code = require("./src/routes/codeInscription.js");
+const folder = require("./src/routes/folder.js");
+const chat = require("./src/routes/chat.js");
+const connectMongo = require("./src/db/db.js");
 const env = require("dotenv");
 env.config();
 
 connectMongo();
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 8080
 // pour le socket.io
 const app = express();
 const server = http.createServer(app);
