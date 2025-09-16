@@ -27,7 +27,8 @@ const io = new Server(server, {
 // le cors
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    // origin: "http://localhost:5173",
+    origin: "https://front-jet-one.vercel.app",
     credentials: true,
   })
 );
