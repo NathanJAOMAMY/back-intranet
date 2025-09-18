@@ -4,10 +4,7 @@ const initDb = require('./initDb.js');
 const connectDB = async () => {
   console.log(process.env.MONGO_URI)
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URI);
     initDb()
     console.log('MongoDB connecté avec succès');
   } catch (err) {
