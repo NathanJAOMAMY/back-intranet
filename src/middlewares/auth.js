@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const SECRET = process.env.JWT_SECRET || 'MY_PRIVATE_KEY'; // <-- doit être identique à la génération du token
+const SECRET = process.env.JWT_SECRET || 'MY_PRIVATE_KEY';
 
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;

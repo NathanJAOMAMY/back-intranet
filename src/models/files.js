@@ -1,46 +1,26 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const fileSchema = new mongoose.Schema({ 
-    id_file: {
-        type: String,
-        required: true,
-        unique: true
+const fileSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true, unique: true },
+    fileName: { type: String, maxlength: 255, default: null },
+    originalName: { type: String, maxlength: 255, required: true },
+    sizeFile: { type: Number, required: true }, // en bytes
+    typeFile: { type: String, maxlength: 50, required: true },
+    mimeType: { type: String, maxlength: 100 },
+    url: { type: String, required: true },
+    readCount: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ["active", "archived", "deleted"],
+      default: "active",
     },
-    libelle_file: {
-        type: String,
-        maxlength: 255,
-        default: null
-    },
-    size_file: {
-        type: String,
-        maxlength: 50,
-        required: true
-    },
-    type_file: {
-        type: String,
-        maxlength: 50,
-        required: true
-    },
-    url: {
-        type: String,
-        maxlength: 255,
-        required: true
-    },
-    readed: {
-        type: Number,
-        default: 0,
-        required: true
-    },
-    status_file: {
-        type: Number,
-        default: 1
-    },
-    folder_id: {
-        type: String,
-        default: null
-    }
-}, {
-    timestamps: true // createdAt and updatedAt fields
-}); 
- 
-module.exports = mongoose.model('File', fileSchema);
+    folderId: { type: String, default: null },
+    userId: { type: String, required: true },
+    userIdAcces: { type: [String], default: [] },
+    departementAcces: { type: [String], default: [] }
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("File", fileSchema);

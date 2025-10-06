@@ -1,24 +1,20 @@
-let db; // sera injecté depuis connectDB.js
-
-const init = (database) => {
-  db = database;
-};
-
+const Chat = require("../models/chatMessage");
+const ConversationUsers = require("../models/conversationUser");
+const ChatConversation = require("../models/chatConversation");
 //  Envoyer un message
 const sendMessage = async (req, res) => {
   const { conversationId, content, senderId, id, file } = req.body;
 
   try {
-    const result = await db.collection("chatMessages").insertOne({
-      id,
-      content,
-      conversationId,
-      senderId,
+    const message = await Chat.create({
+      id: id, // UUID fourni par le front-end
+      content: content,
+      conversationId: conversationId,
+      senderId: senderId,
       file: file || null,
-      createdAt: new Date()
     });
 
-    res.status(201).json({ message: "Message envoyé !", data: result.ops[0] });
+    res.status(201).json({ message: "Message envoyé !", data: message });
   } catch (error) {
     console.error("Erreur serveur :", error);
     res.status(500).json({ error: "Erreur lors de l'envoi du message" });
@@ -30,132 +26,131 @@ const getMessages = async (req, res) => {
   const { conversationId } = req.params;
 
   try {
-    const messages = await db
-      .collection("chatMessages")
-      .find({ conversationId })
-      .sort({ createdAt: 1 })
-      .toArray();
-
+    const messages = await Chat.find({ conversationId }).sort({ createdAt: 1 });
     res.json(messages);
   } catch (error) {
     console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur lors de la récupération des messages" });
+    res.status(500).json({
+      error: "Erreur lors de la récupération des messages",
+    });
   }
 };
-
-// Récupérer les conversations d'un utilisateur
-const getChatConversation = async (req, res) => {
+// Recupere les conversation de l'utilisateur
+const getChatConvesation = async (req, res) => {
   const { idUser } = req.params;
   try {
-    const chatConversation = await db
-      .collection("chatConversations")
-      .find({ userIdConversations: idUser })
-      .sort({ updatedAt: -1 })
-      .toArray();
-
+    const chatConversation = await ChatConversation.find({
+      userIdConversations: idUser,
+    }).sort({ updatedAt: -1 });
     res.json(chatConversation);
   } catch (error) {
     console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur lors de la récupération des conversations" });
+    res.status(500).json({
+      error: "Erreur lors de la récupération des messages",
+    });
   }
 };
-
-// Créer une conversation
-const setChatConversation = async (req, res) => {
+// Creation d'une conversation
+const setChatConvesation = async (req, res) => {
   const { id, name, isRead, userIdConversations } = req.body;
   try {
-    const result = await db.collection("chatConversations").insertOne({
-      id,
-      name,
-      isRead,
-      userIdConversations,
-      updatedAt: new Date()
+    const chatConversation = await ChatConversation.create({
+      id: id,
+      name: name,
+      isRead: isRead,
+      userIdConversations: userIdConversations,
     });
-
-    res.status(201).json({ message: "Conversation créée !", data: result.ops[0] });
+    res
+      .status(201)
+      .json({ message: "conversation creer !", date: chatConversation });
   } catch (error) {
-    console.log("Erreur : ", error);
-    res.status(500).json({ error: "Erreur lors de la création de la conversation" });
+    console.log("erreur : ", error);
+    res.status(500).json({ error: "Erreur lors du creation du conversation" });
   }
 };
-
-// Ajouter un utilisateur à une conversation
+//  Ajouter un utilisateur à une conversation
 const setConversationUser = async (req, res) => {
   const { idConversation, idUser, isRead } = req.body;
 
   try {
-    const result = await db.collection("conversationUsers").insertOne({
-      idConversation,
-      idUser,
-      isRead
+    const conversationUser = await ConversationUsers.create({
+      idConversation: idConversation,
+      idUser: idUser,
+      isRead: isRead,
     });
 
     res.status(201).json({
       message: "Utilisateur ajouté à la conversation",
-      data: result.ops[0],
+      data: conversationUser,
     });
   } catch (error) {
     console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur lors de l'ajout de l'utilisateur" });
+    res.status(500).json({
+      error: "Erreur lors de l'ajout de l'utilisateur à la conversation",
+    });
   }
 };
 
-// Récupérer les utilisateurs d'une conversation
+//  Récupérer les utilisateurs d'une conversation
 const getConversationUsers = async (req, res) => {
   const { idUser } = req.params;
 
   try {
-    const conversationUsers = await db
-      .collection("conversationUsers")
-      .find({ idUser })
-      .toArray();
-
-    res.status(200).json(conversationUsers);
+    const conversationUsers = await ConversationUsers.find({
+      idUser: idUser,
+    });
+    res.status(201).json(conversationUsers);
   } catch (error) {
     console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur lors de la récupération des utilisateurs" });
+    res.status(500).json({
+      error:
+        "Erreur lors de la récupération des utilisateurs de la conversation",
+    });
   }
 };
 
-// Trouver un utilisateur dans une conversation
 const findConversationUser = async (req, res) => {
   const { idConversation, idUser } = req.params;
-
+  
   try {
-    const conversationUser = await db.collection("conversationUsers").findOne({
-      idConversation,
-      idUser
+    const conversationUser = await ConversationUsers.findOne({
+      idConversation: idConversation,
+      idUser: idUser,
     });
-
     res.status(200).json(conversationUser);
   } catch (error) {
     console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur lors de la récupération de l'utilisateur" });
+    res.status(500).json({
+      error:
+        "Erreur lors de la récupération de l'utilisateur de la conversation",
+    });
   }
 };
-
-// Mettre à jour le statut de lecture
+//  Mettre à jour le statut de lecture
 const updateConversationUser = async (req, res) => {
   const { idConversation, idUser, isRead } = req.body;
 
   try {
-    const result = await db.collection("conversationUsers").updateOne(
-      { idConversation, idUser },
-      { $set: { isRead } }
+    const updated = await ConversationUsers.updateOne(
+      { idConversation: idConversation, idUser: idUser },
+      { $set: { isRead: isRead } }
     );
 
-    if (result.modifiedCount > 0) {
+    if (updated.modifiedCount > 0) {
       res.status(200).json({ message: "Statut de lecture mis à jour" });
     } else {
-      res.status(404).json({ message: "Conversation ou utilisateur non trouvé" });
+      res
+        .status(404)
+        .json({ message: "Conversation ou utilisateur non trouvé" });
     }
   } catch (error) {
     console.error("Erreur serveur :", error);
-    res.status(500).json({ error: "Erreur lors de la mise à jour" });
+    res.status(500).json({
+      error: "Erreur lors de la mise à jour du statut de lecture",
+    });
   }
 };
 
-// Mise à jour d'une conversation
 const updatedConversation = async (req, res) => {
   const { conversationId, userIds, conversation } = req.body;
 
@@ -166,29 +161,34 @@ const updatedConversation = async (req, res) => {
   try {
     let updateQuery = {};
 
+    //ajout de nouveaux membres sans duplication
     if (Array.isArray(userIds) && userIds.length > 0) {
       updateQuery.$addToSet = { userIdConversations: { $each: userIds } };
     }
 
+    //mise à jour d'autres champs de la conversation
     if (conversation && typeof conversation === "object") {
       updateQuery.$set = conversation;
     }
 
     if (Object.keys(updateQuery).length === 0) {
-      return res.status(400).json({ message: "Aucune donnée à mettre à jour." });
+      return res
+        .status(400)
+        .json({ message: "Aucune donnée à mettre à jour." });
     }
 
-    const updated = await db.collection("chatConversations").findOneAndUpdate(
+    // Mise à jour
+    const updatedConversation = await ChatConversation.findOneAndUpdate(
       { id: conversationId },
       updateQuery,
-      { returnOriginal: false }
+      { new: true }
     );
 
-    if (!updated.value) {
+    if (!updatedConversation) {
       return res.status(404).json({ message: "Conversation introuvable." });
     }
 
-    return res.status(200).json(updated.value);
+    return res.status(200).json(updatedConversation);
   } catch (err) {
     console.error("Erreur mise à jour conversation:", err);
     return res.status(500).json({ message: "Erreur serveur." });
@@ -196,14 +196,13 @@ const updatedConversation = async (req, res) => {
 };
 
 module.exports = {
-  init,
   sendMessage,
   getMessages,
   setConversationUser,
   updateConversationUser,
   getConversationUsers,
-  setChatConversation,
-  getChatConversation,
+  setChatConvesation,
+  getChatConvesation,
   updatedConversation,
   findConversationUser,
 };

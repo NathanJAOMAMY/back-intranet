@@ -1,29 +1,14 @@
-// connectDB.js
-const { MongoClient } = require("mongodb");
-const initDb = require("./initDb.js");
+const mongoose = require('mongoose');
+const initDb = require('./initDb.js');
 
 const connectDB = async () => {
-  const mongoUri = process.env.MONGO_URI; 
-  console.log("Tentative de connexion à MongoDB avec URI :", mongoUri);
-
-  const client = new MongoClient(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    ssl: false // ⚠️ passe à true si TLS est activé côté serveur
-  });
-
   try {
-    await client.connect();
-    console.log("✅ MongoDB connecté avec succès !");
-
-    const db = client.db("intranet"); // nom de ta base
-    await initDb(db); // on initialise la base
-
-    // On garde le client pour le reste de l'application
-    return { client, db };
+    await mongoose.connect(process.env.MONGO_URI);
+    initDb()
+    console.log('MongoDB connecté avec succès');
   } catch (err) {
-    console.error("❌ Échec de connexion à MongoDB :", err);
-    process.exit(1);
+    console.error(' Échec de connexion à MongoDB :', err);
+    process.exit(1); // arrête l'app si la connexion échoue
   }
 };
 

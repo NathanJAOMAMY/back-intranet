@@ -1,3 +1,5 @@
+const env = require("dotenv");
+env.config();
 const express = require("express");
 const cors = require("cors");
 const { Server } = require("socket.io");
@@ -10,11 +12,10 @@ const code = require("./src/routes/codeInscription.js");
 const folder = require("./src/routes/folder.js");
 const chat = require("./src/routes/chat.js");
 const connectMongo = require("./src/db/db.js");
-const env = require("dotenv");
-env.config();
+
 
 connectMongo();
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 3001
 // pour le socket.io
 const app = express();
 const server = http.createServer(app);
@@ -44,5 +45,5 @@ app.use("/chat", chat);
 app.use("/social", socialMediaRoutes);
 
 server.listen(port, () => {
-  console.log(`Serveur lancer`);
+  console.log(`Serveur lancer ${port}`);
 });

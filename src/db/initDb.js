@@ -1,12 +1,10 @@
 const bcrypt = require("bcrypt");
 const { v4: uuid } = require("uuid");
+const User = require("../models/users"); 
 
-const initDb = async (db) => {
+const initDb = async () => {
   try {
-    const usersCollection = db.collection("users");
-
-    // Vérifier si l'utilisateur Admin existe déjà
-    const existing = await usersCollection.findOne({ userName: "Admin" });
+    const existing = await User.findOne({ userName: "Admin" });
 
     if (!existing) {
       const defaultUsers = [
@@ -28,16 +26,16 @@ const initDb = async (db) => {
       );
 
       // Insert tous les utilisateurs d’un coup
-      await usersCollection.insertMany(usersWithHashedPasswords);
+      await User.insertMany(usersWithHashedPasswords);
 
-      console.log("✅ Utilisateurs par défaut créés avec succès !");
+      // console.log("Utilisateurs par défaut créés avec succès !");
     } else {
-      console.log("ℹ️ Les utilisateurs par défaut existent déjà.");
+      // console.log("Les utilisateurs par défaut existent déjà.");
     }
 
-    console.log("✅ Base de données initialisée !");
+    // console.log("Base de données initialisée !");
   } catch (err) {
-    console.error("❌ Erreur lors de l'initialisation de la base :", err);
+    console.error("Erreur lors de l'initialisation de la base :", err);
   }
 };
 

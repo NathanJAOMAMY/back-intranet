@@ -9,12 +9,22 @@ const {
   deleteFile,
   getFileById,
   createMultipleFiles,
+  shareFile,
+  getSharedFiles,
+  getFilesSharedWithMe,
+  updateFile,
+  shareFileWithDepartement,
 } = require("../controllers/fileController");
 
 router.post("/", createFile);
 router.post("/many", createMultipleFiles);
+router.post("/share/:id", shareFile);
+router.post("/share-departement/:id", shareFileWithDepartement);
+
 
 router.get("/", getFiles);
+router.get("/shared", getSharedFiles);
+router.get("/shared-with-me", getFilesSharedWithMe);
 router.get("/:id", getFileById);
 router.delete("/:id", deleteFile);
 router.get("/read/:foldername/:filename", (req, res) => {
@@ -29,4 +39,5 @@ router.get("/read/:foldername/:filename", (req, res) => {
   }
 });
 
+router.put("/update", updateFile);
 module.exports = router;

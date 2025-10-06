@@ -1,24 +1,12 @@
-
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const folderSchema = new mongoose.Schema({
-    id_folder: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    libelle_folder: {
-        type: String, 
-        maxlength: 50,
-        default: null
-    },
-    status_folder: {
-        type: Number,
-        default: 1
-    }
-    // Assuming you want to keep the timestamps
-}, {
-    timestamps: true // createdAt and updatedAt fields
-});
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  parentFolderId: { type: String, default: null }, // pour sous-dossiers
+  userId: { type: String, required: true },
+  userIdAcces: { type: [String], default: [] },
+  departementAcces: { type: [String], default: [] }
+}, { timestamps: true });
 
-module.exports = mongoose.model('Folder', folderSchema);
+module.exports = mongoose.model("Folder", folderSchema);

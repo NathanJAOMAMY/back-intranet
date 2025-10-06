@@ -1,51 +1,87 @@
-let db;
-const { ObjectID } = require("mongodb");
+const SocialPost = require('../../models/mongo/socialPost');
 
-const init = (database) => {
-  db = database;
-};
+// const { syncUserToMongo } = require('../../utils/userSync');
 
-// 🔹 Créer un post
+// exports.createPost = async (req, res) => {
+//   console.log('POST /social/posts');
+//   console.log('req.body:', req.body);
+//   console.log('req.files:', req.files);
+//   try {
+//     const { content, isArticle, articleTitle, links = [] } = req.body;
+//     const { userId } = req.user; // <-- Prend userId du token
+
+//     // Convertir les liens en tableau si c'est une string
+//     const linksArray = typeof links === 'string' ? [links] : links;
+
+//     const post = new SocialPost({
+//       content,
+//       idUser: String(userId), // <-- Utilise userId ici
+//       isArticle: !!isArticle,
+//       ...(isArticle && { articleTitle }),
+//       files: req.files?.map(file => ({
+//         url: `/social/${file.filename}`,
+//         type: file.mimetype.split('/')[0] === 'image' ? 'image' : 
+//               file.mimetype.split('/')[0] === 'video' ? 'video' : 'file'
+//       })) || [],
+//       links: linksArray.filter(Boolean).map(url => ({ url })),
+//       reactions: [], // <-- AJOUTE CETTE LIGNE
+//       comments: []   // <-- AJOUTE CETTE LIGNE
+//     });
+
+//     await post.save();
+//     res.status(201).json(post);
+//   } catch (error) {
+//     res.status(500).json({ 
+//       error: 'Erreur création post',
+//       details: error.message 
+//     });
+//   }
+// };
+
 exports.createPost = async (req, res) => {
+  console.log('POST /social/posts');
+  console.log('req.body:', req.body);
+  
   try {
-    const { content, isArticle, articleTitle, urlFile = [], links = [], idUser } = req.body;
+    const { content, isArticle, articleTitle,urlFile, links = [] , idUser} = req.body;
 
-    const linksArray = typeof links === "string" ? [links] : links;
+    // Convertir les liens en tableau si c'est une string
+    const linksArray = typeof links === 'string' ? [links] : links;
 
-    const post = {
+    const post = new SocialPost({
       content,
       idUser: String(idUser),
       isArticle: !!isArticle,
       ...(isArticle && { articleTitle }),
       files: urlFile.filter(Boolean).map(url => ({ url })),
       links: linksArray.filter(Boolean).map(url => ({ url })),
-      reactions: [],
-      comments: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      reactions: [], 
+      comments: []  
+    });
 
-    const result = await db.collection("socialPosts").insertOne(post);
-    res.status(201).json(result.ops[0]);
+    await post.save();
+    res.status(201).json(post);
   } catch (error) {
-    res.status(500).json({ error: "Erreur création post", details: error.message });
+    res.status(500).json({ 
+      error: 'Erreur création post',
+      details: error.message 
+    });
   }
 };
 
-// 🔹 Récupérer tous les posts avec infos utilisateur
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await db.collection("socialPosts").aggregate([
+    const posts = await SocialPost.aggregate([
       { $sort: { createdAt: -1 } },
       {
         $lookup: {
-          from: "users",
-          localField: "idUser",
-          foreignField: "idUser",
-          as: "user"
+          from: 'users', // nom de la collection MongoDB (souvent 'users')
+          localField: 'idUser',
+          foreignField: 'idUser',
+          as: 'user'
         }
       },
-      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
       {
         $project: {
           content: 1,
@@ -67,169 +103,177 @@ exports.getPosts = async (req, res) => {
           }
         }
       }
-    ]).toArray();
-
+    ]);
     res.json(posts);
   } catch (error) {
-    res.status(500).json({ error: "Erreur récupération posts", details: error.message });
+    res.status(500).json({ 
+      error: 'Erreur récupération posts',
+      details: error.message 
+    });
   }
 };
 
-// 🔹 Ajouter une réaction à un post
+// POST /social/posts/:postId/reaction
 exports.addReaction = async (req, res) => {
   try {
     const { postId } = req.params;
     const { type, userId } = req.body;
-
-    const post = await db.collection("socialPosts").findOne({ _id: ObjectID(postId) });
+    const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
 
-    post.reactions = post.reactions || [];
-    const existing = post.reactions.find(r => r.userId === userId);
-    if (existing) existing.types = type;
-    else post.reactions.push({ userId, types: type });
+    if (!post.reactions) post.reactions = [];
+    const existingReaction = post.reactions.find(r => r.userId === userId);
+    if (existingReaction) {
+      existingReaction.types = type;
+    } else {
+      post.reactions.push({ userId, types: type });
+    }
 
-    await db.collection("socialPosts").updateOne(
-      { _id: ObjectID(postId) },
-      { $set: { reactions: post.reactions, updatedAt: new Date() } }
-    );
-
+    await post.save();
     res.json(post.reactions);
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la réaction au post" });
   }
 };
 
-// 🔹 Ajouter un commentaire
+// POST /social/posts/:postId/comment
 exports.addComment = async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const { content, userId } = req.body;
-
-    const comment = { _id: new ObjectID(), userId, content, reactions: [], replies: [], createdAt: new Date() };
-
-    await db.collection("socialPosts").updateOne(
-      { _id: ObjectID(postId) },
-      { $push: { comments: comment }, $set: { updatedAt: new Date() } }
-    );
-
-    res.json(comment);
-  } catch (error) {
-    res.status(500).json({ error: "Erreur lors de l'ajout du commentaire" });
-  }
+  const { postId } = req.params;
+  const { content , userId } = req.body; 
+  console.log(userId)
+  const post = await SocialPost.findById(postId);
+  post.comments.push({ userId, content });
+  await post.save();
+  res.json(post.comments);
 };
 
-// 🔹 Ajouter une réaction à un commentaire
+// POST /social/posts/:postId/comment/:commentId/reaction
 exports.addCommentReaction = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
     const { type, userId } = req.body;
-
-    const post = await db.collection("socialPosts").findOne({ _id: ObjectID(postId) });
+    const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
 
-    const comment = post.comments.find(c => c._id.toString() === commentId);
+    const comment = post.comments.id(commentId);
     if (!comment) return res.status(404).json({ error: "Commentaire non trouvé" });
 
-    comment.reactions = comment.reactions || [];
-    const existing = comment.reactions.find(r => r.userId === userId);
-    if (existing) existing.types = type;
-    else comment.reactions.push({ userId, types: type });
+    if (!comment.reactions) comment.reactions = [];
+    const existingReaction = comment.reactions.find(r => r.userId === userId);
+    if (existingReaction) {
+      existingReaction.types = type;
+    } else {
+      comment.reactions.push({ userId, types: type });
+    }
 
-    await db.collection("socialPosts").updateOne(
-      { _id: ObjectID(postId), "comments._id": ObjectID(commentId) },
-      { $set: { "comments.$": comment, updatedAt: new Date() } }
-    );
-
+    await post.save();
     res.json(comment.reactions);
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la réaction au commentaire" });
   }
 };
 
-// 🔹 Répondre à un commentaire
 exports.replyToComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
     const { content, userId } = req.body;
+    const post = await SocialPost.findById(postId);
+    if (!post) return res.status(404).json({ error: "Post non trouvé" });
+    const comment = post.comments.id(commentId);
+    if (!comment) return res.status(404).json({ error: "Commentaire non trouvé" });
 
-    const reply = { _id: new ObjectID(), userId, content, reactions: [], createdAt: new Date() };
+    comment.replies.push({
+      userId,
+      content,
+      createdAt: new Date()
+    });
 
-    await db.collection("socialPosts").updateOne(
-      { _id: ObjectID(postId), "comments._id": ObjectID(commentId) },
-      { $push: { "comments.$.replies": reply }, $set: { updatedAt: new Date() } }
-    );
-
-    res.json(reply);
+    await post.save();
+    res.json(comment.replies);
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la réponse au commentaire" });
   }
 };
 
-// 🔹 Ajouter une réaction à une réponse
+// Ajout d'une réaction à une réponse d'un commentaire
 exports.addReplyReaction = async (req, res) => {
   try {
     const { postId, commentId, replyId } = req.params;
     const { type, userId } = req.body;
-
-    const post = await db.collection("socialPosts").findOne({ _id: ObjectID(postId) });
+    const post = await SocialPost.findById(postId);
     if (!post) return res.status(404).json({ error: "Post non trouvé" });
 
-    const comment = post.comments.find(c => c._id.toString() === commentId);
+    const comment = post.comments.id(commentId);
     if (!comment) return res.status(404).json({ error: "Commentaire non trouvé" });
 
-    const reply = comment.replies.find(r => r._id.toString() === replyId);
+    const reply = comment.replies.id(replyId);
     if (!reply) return res.status(404).json({ error: "Réponse non trouvée" });
 
-    reply.reactions = reply.reactions || [];
-    const existing = reply.reactions.find(r => r.userId === userId);
-    if (existing) existing.types = type;
-    else reply.reactions.push({ userId, types: type });
+    if (!reply.reactions) reply.reactions = [];
+    const existingReaction = reply.reactions.find(r => r.userId === userId);
+    if (existingReaction) {
+      existingReaction.types = type;
+    } else {
+      reply.reactions.push({ userId,types: type });
+    }
 
-    await db.collection("socialPosts").updateOne(
-      { _id: ObjectID(postId), "comments._id": ObjectID(commentId) },
-      { $set: { "comments.$": comment, updatedAt: new Date() } }
-    );
-
+    await post.save();
     res.json(reply.reactions);
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la réaction à la réponse" });
   }
 };
 
-// 🔹 Modifier un post
+
 exports.updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { content, isArticle, articleTitle, links = [], urlFile = [] } = req.body;
+    const { content, isArticle, articleTitle, links = [] } = req.body;
+    // Si tu utilises l’auth, prends userId du token
+    // const { userId } = req.user;
+    // Sinon, prends-le du body (pas recommandé pour la sécurité)
+    const { idUser } = req.body;
 
-    const linksArray = typeof links === "string" ? [links] : links;
-    const files = urlFile.filter(Boolean).map(url => ({ url }));
+    // Gère les fichiers uploadés
+    let files = [];
+    if (req.files && req.files.length > 0) {
+      files = req.files.map(file => ({
+        url: `/social/${file.filename}`,
+        type: file.mimetype.split('/')[0] === 'image' ? 'image' :
+              file.mimetype.split('/')[0] === 'video' ? 'video' : 'file'
+      }));
+    } else if (req.body.urlFile) {
+      // Si urlFile est envoyé (ex: pour garder les anciens fichiers)
+      files = req.body.urlFile.filter(Boolean).map(url => ({ url }));
+    }
 
-    const updated = await db.collection("socialPosts").findOneAndUpdate(
-      { _id: ObjectID(postId) },
-      { $set: { content, isArticle: !!isArticle, articleTitle, files, links: linksArray, updatedAt: new Date() } },
-      { returnOriginal: false }
+    const linksArray = typeof links === 'string' ? [links] : links;
+
+    const updated = await SocialPost.findByIdAndUpdate(
+      postId,
+      {
+        content,
+        isArticle: !!isArticle,
+        articleTitle,
+        files,
+        links: linksArray.filter(Boolean).map(url => ({ url }))
+      },
+      { new: true }
     );
-
-    if (!updated.value) return res.status(404).json({ error: "Post non trouvé" });
-    res.json(updated.value);
+    if (!updated) return res.status(404).json({ error: "Post non trouvé" });
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la modification du post", details: error.message });
   }
 };
 
-// 🔹 Supprimer un post
 exports.deletePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    const deleted = await db.collection("socialPosts").deleteOne({ _id: ObjectID(postId) });
-
-    if (deleted.deletedCount === 0) return res.status(404).json({ error: "Post non trouvé" });
+    const deleted = await SocialPost.findByIdAndDelete(postId);
+    if (!deleted) return res.status(404).json({ error: "Post non trouvé" });
     res.json({ message: "Post supprimé avec succès" });
   } catch (error) {
     res.status(500).json({ error: "Erreur lors de la suppression du post", details: error.message });
   }
 };
-
-module.exports.init = init;
