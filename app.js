@@ -29,7 +29,7 @@ const io = new Server(server, {
 app.use(
   cors({
     // origin: "http://localhost:5173",
-    origin: "https://front-jet-one.vercel.app",
+    origin: "intranet.promabio.com",
     credentials: true,
   })
 );
