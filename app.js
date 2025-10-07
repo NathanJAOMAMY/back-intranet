@@ -29,7 +29,7 @@ const io = new Server(server, {
 app.use(
   cors({
     // origin: "http://localhost:5173",
-    origin: "intranet.promabio.com",
+    origin: "https://intranet.promabio.com",
     credentials: true,
   })
 );
